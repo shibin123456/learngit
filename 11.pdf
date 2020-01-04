@@ -1,0 +1,371 @@
+---
+title
+tags: 新建,模板,小书匠
+
+# renderNumberedHeading: true
+grammar_abbr: true
+grammar_table: true
+grammar_defList: true
+grammar_emoji: true
+grammar_footnote: true
+grammar_ins: true
+grammar_mark: true
+grammar_sub: true
+grammar_sup: true
+grammar_checkbox: true
+grammar_mathjax: true
+grammar_flow: true
+grammar_sequence: true
+grammar_plot: true
+grammar_code: true
+grammar_highlight: true
+grammar_html: true
+grammar_linkify: true
+grammar_typographer: true
+grammar_video: true
+grammar_audio: true
+grammar_attachment: true
+grammar_mermaid: true
+grammar_classy: true
+grammar_cjkEmphasis: true
+grammar_cjkRuby: true
+grammar_center: true
+grammar_align: true
+grammar_tableExtra: true
+grammar_cjkRuby: true
+---
+
+
+欢迎使用 **{小书匠}(xiaoshujiang)编辑器**，您可以通过 `小书匠主按钮>模板` 里的模板管理来改变新建文章的内容。
+
+
+###  <center>Mybaits与设计模式</center>
+###### <center>时彬</center>
+#### 1.介绍
+* 背景
+&nbsp;&nbsp;&nbsp;&nbsp;在项目开发中，开发人员需要使用面向对象的思维实现业务逻辑，但是设计数据库表或是在操作数据库记录时，需要关系型的思维方式来思考问题。即应用程序与关系数据库交互时，数据在对象和关系结构中的表、列、字段进行转换。
+
+ * JDBC
+ &nbsp;&nbsp;&nbsp;&nbsp;JDBC是Java与数据库交互的统一API，我们可以通过它来完成对数据库的各种操作。但是在实际的生产环境中我们对于系统的性能是有一定要求的，数据库作为比较珍贵的资源，很容易成为整个系统的性能瓶颈，我们一般不直接通过JDBC来简单粗暴地直接访问数据库与关闭连接。应用程序一般需要通过集成缓存、数据源、数据库连接池等组件来进行优化，ORM框架就应运而生了。
+ 
+* ORM
+ &nbsp;&nbsp;&nbsp;&nbsp;ORM（Object Relational Mapping,对象-关系映射）。ORM的功能是根据配置文件，完成数据在对象模型与关系模型之间的映射，屏蔽重复的代码，简化开发。
+![enter description here](./images/ORM_1.png)
+&nbsp;&nbsp;&nbsp;&nbsp; 很多ORM框架都集成了第三方缓存、第三方数据源等组件的接口，这些接口是统一的，开发人员可以通过简单的配置来完成集成。
+
+* Hibernate与Mybatis
+   *  Hibernate
+ &nbsp;&nbsp;&nbsp;Hibernate是世界上最著名的ORM框架之一，Java开发人员可以用看Java对象的角度来看待数据库表中的数据行。数据库中的表在配置过后，都对应一个类，使得开发人员使用的时候完全不用考虑数据库底层的实现和SQL的编写。
+ 
+    *  Mybatis
+ &nbsp;&nbsp;&nbsp;与Hibernate的全自动不同，Mybatis则是一种半自动的框架。Mybatis通过映射配置文件或相应注解将ResultSet映射为Java对象，其映射可以嵌套其他的映射以及子查询，从而实现复杂的逻辑，也可以实现一对一、一对多、多对多的映射。
+ &nbsp;&nbsp;&nbsp;与Hibernate相比，Mybatis更加轻量级，可控性也更高，使用Mybatis时我们会直接编写待执行的原生SQL语句，这就给了我们直接优化SQL语句的机会，比如让SQL语句选择合适的索引，能更好地提高系统的性能，比较适合大数据量、高并发等场景。因此更受国内互联网公司的青睐。
+#### 2.Mybatis整体架构
+ &nbsp;&nbsp;&nbsp;&nbsp;Mybatis的整体架构分为三层，分别是基础支持层、核心处理层和接口层。
+ * 基础支持层
+ &nbsp;&nbsp;&nbsp;&nbsp;基础支持层包含整个Mybatis的基础模块，这些模块为核心处理层的功能提供了良好的支撑。包括反射模块、类型转换模块、日志模块、数据源模块、事务模块、缓存模块等。
+ 
+ * 核心处理层
+ &nbsp;&nbsp;&nbsp;&nbsp;核心处理层实现了Mybatis的核心处理流程，其中包括Mybatis的初始化以及完成一次数据库操作的涉及的全部流程。模块包括位置解析、SQL解析与script模块、SQL执行与插件等。
+
+ * 接口层
+ &nbsp;&nbsp;&nbsp;&nbsp;其核心是SqlSession接口，该接口定义了Mybatis暴露给程序调用的API，也就是上层应用与Mybatis交互的桥梁。接口层在接收到调用请求时，会调用处理层的模块来完成具体操作。
+ 
+ ![enter description here](./images/三层.png)
+ &nbsp;&nbsp;&nbsp; 执行流程：程序首先加载配置文件，并根据配置的内容创建SQLSessionFactory对象；然后通过SQLSessionFactory创建SQLSession对象，SQLSession接口中定义了各种方法；之后，通过SQLSession执行配置文件中定义的SQL语句，完成操作后提交事务关闭SQLSession对象。
+ #### 3.Mybatis中的设计模式
+ ###### 1.设计模式
+ 首先简单回顾一下设计模式中的六大原则
+  * 单一职责原则：不要存在多于一个导致类变更的原因，简单来说，一个类只负责唯一一项职责。
+  
+  * 里氏替换原则：基类可以出现的地方，子类一定可以出现。 LSP是继承复用的基石，只有当衍生类可以替换掉基类，软件单位的功能不受到影响时，基类才能真正被复用，而衍生类也能够在基类的基础上增加新的行为。
+  * 依赖倒置原则：系统的高层模块不应该依赖底层模块的具体的实现，二者都应该依赖抽象类或者接口。简单来说我们要面向接口编程。当需求发生变化时对外接口不变，只提供新的实现类即可。
+  * 接口隔离原则：一个类对另一个类的依赖应该建立在最小的接口上。简单来说我们要尽量设计出功能单一的接口，这样也能保证实现类的职责单一。
+  * 迪米特原则：一个对象应该对其他对象保持最少的了解。简单来说，我们要减低类之间的耦合。
+  * 开放-封闭原则：程序要对扩展开放，对修改关闭。当需求发生变化时，我们可以通过添加新的模块满足需求，而不是修改原来的实现代码来满足新需求。
+  
+  **在这六条原则中，开放-封闭是最基础的原则，也是其他原则以及后文介绍的所有设计模式的最终目标。**
+ ###### 2.日志模块与适配器模式
+ * 适配器模式
+  &nbsp;&nbsp;&nbsp;&nbsp;适配器模式的主要目的是解决由于接口不能兼容而导致类无法使用的问题，适配器模式会将需要适配的类转换成调用者能够使用的目标接口。
+ &nbsp;&nbsp;&nbsp; 在Mybatis的日志模块中，就使用了适配器模式。Mybatis内部调用其日志模块时，使用了其内部接口（org.apache.ibatis.logging.Log）但是Log4j、Log4j2等第三方日志组件对外提供的接口各不相同，Mybatis为了集成和复用这些第三方日志组件，在其日志模块中提供了多种Adapter，将这些第三方日志组件对外的接口适配成Log接口，这样Mybatis内部就可以统一通过Log接口来调用第三方日志组件了。
+ 前面描述的多种第三方日志组件都有各自的Log级别，且都有所不同，例如java.util.logging提供了9种级别，而Log4j2则有6种日志级别。Mybatis统一提供了trace、debug、warn、error四个级别，可以满足绝大多数场景的需求。
+ * Log及其实现类
+ ![enter description here](./images/Log实现类.png)
+  * 具体流程
+  在LogFactory类加载时会执行其静态代码块，其逻辑是按顺序加载并实例化对应的日志组件的适配器，然后使用LogFactory.logConstructor这个静态字段，记录当前使用的第三方日志组件的适配器
+  ```java
+  // 记录当前使用的第三方日志组件所对应的适配器的构造方法
+private static Constructor<? extends Log> logConstructor;
+
+// 针对每种日志组件调用tryImplementation()方法进行尝试加载。
+    static {
+        tryImplementation(LogFactory::useSlf4jLogging);
+        tryImplementation(LogFactory::useCommonsLogging);
+        tryImplementation(LogFactory::useLog4J2Logging);
+        tryImplementation(LogFactory::useLog4JLogging);
+        tryImplementation(LogFactory::useJdkLogging);
+        tryImplementation(LogFactory::useNoLogging);
+    }
+
+// 以JDK的Log为例 ，分析JdkLoggingImpl类
+//其实现了Mybatis的Log接口，并且封装了JDK原生的Log对象，Mybatis的Log接口的功能全部通过调用底层封装对象实现。
+
+// 底层封装Logger对象
+private final Logger log;
+
+//将请求全部委托给了JDK的Logger对象的相应方法
+public void error(String s, Throwable e) {
+        this.log.log(Level.SEVERE, s, e);
+    }
+ 
+ public void debug(String s) {
+        this.log.log(Level.FINE, s);
+    }
+```
+实现了MybatisLog接口的其他适配器与JdkLoggingImpl类似，不再赘述。
+ ###### 延迟加载与代理模式
+ * 代理模式
+
+ 先简单看一下代理模式。代理模式中主要有Subject、RealSubject、Proxy三个角色。
+ 其中Subject是程序中的业务逻辑接口，RealSubject是实现了Subject接口的真正业务类Proxy是实现了Subject接口的代理类，其中封装了Realsubject对象。在程序中不会直接调用RealSubject的方法，而是使用Proxy对象实现相关功能。
+ 代理模式可以用于Mybatis中的延迟加载功能，我们知道查询数据库是个耗时的操作，而有些时候查询到的数据也并没有真正被程序使用。延迟加载功能就可以有效避免这种浪费，系统访问数据库时，首先可以得到一个代理对象，此时并没有任何数据库查询操作，当系统真正需要使用数据时，再调用代理对象完成数据库查询并返回数据。这种代理模式也被成为“静态代理模式”，因为在编译阶段就要为每一个RealSubject类创建一个Proxy类，当需要代理的类很多时，就会出现大量的Proxy类。因此我们可以使用JDK动态代理来解决这个问题。
+ * JDK动态代理
+JDK动态代理的核心是InnovationHandler接口。对于需要相同代理行为的业务类，只需要提供一个InnovationHandler实现即可。在程序运行时，JDK会为每个RealSubject类动态生成代理类并加载到虚拟机中，之后创建对于的代理对象。
+JDK动态代理实现的入口是Proxy类中的newProxyInstance()这个静态方法，它的三个参数分别是加载动态生成的代理类的类加载器、业务类的实现接口、上面介绍的InnovationHandler对象。具体实现
+ ```java
+    public static Object newProxyInstance(ClassLoader loader,
+                                          Class<?>[] interfaces,
+                                          InvocationHandler h)
+        throws IllegalArgumentException
+    {
+        Objects.requireNonNull(h);
+
+        final Class<?>[] intfs = interfaces.clone();
+		
+		// 获取代理类
+        Class<?> cl = getProxyClass0(loader, intfs);
+
+
+	   // 获取代理类的构造方法
+        final Constructor<?> cons = cl.getConstructor(constructorParams)
+		   final InvocationHandler ih = h;
+            
+			// 创建代理对象
+			return cons.newInstance(new Object[]{h});
+    }
+	
+	
+	    private static Class<?> getProxyClass0(ClassLoader loader,
+                                           Class<?>... interfaces) {
+        if (interfaces.length > 65535) {
+            throw new IllegalArgumentException("interface limit exceeded");
+        }
+
+        // If the proxy class defined by the given loader implementing
+        // the given interfaces exists, this will simply return the cached copy;
+        // otherwise, it will create the proxy class via the ProxyClassFactory
+        return proxyClassCache.get(loader, interfaces);
+		
+		// proxyClassCache 是定义在Proxy类中的静态字段，主要用于缓存已经创建过的代理类
+		proxyClassCache = new WeakCache<>(new KeyFactory(), new ProxyClassFactory());
+    }
+	
+ ```
+ WeakCache.get()方法会首先尝试从缓存中查找代理类，如果查找不到，则会创建Factory对象调用其get方法获取代理类。
+ 最后JDK动态代理的实现原理是动态创建代理类并通过指定类加载器加载，然后在创建代理对象时将InvokerHandler对象作为构造参数传入。当调用代理对象时，会调用其invoke方法，并最终调用真正业务对象的相应方法。JDK动态在Mybatis的多个模块都有涉及
+ 
+  ###### VFS与单例模式
+  单例模式是一种比较常见的设计模式。即在整个系统中，单例模式即在系统中，单例类只能有一个实例对象，且需要自行完成实例，并始终对外提供同一实例对象。
+  因为单例模式只允许创建一个单例类的实例对象，避免了频繁地创建对象，所有可以减少GC的次数，也比较节省内存资源，加快对象访问速度。例如，数据库连接池、应用配置等一般都是单例的。VFS也涉及单例的使用。
+  VFS表示虚拟文件系统（Virtual File System）,它用来查找指定路径下的资源，VFS是一个抽象类，Mybatis中提供了JBoss6VFS和DefaultVFS两个VFS的实现，用户也可以提供自定义的VFS实现类。
+  ```java
+  // 记录了Mybatis提供的两个VFS实现类
+  public static final Class<?>[] IMPLEMENTATIONS = new Class[]{JBoss6VFS.class, DefaultVFS.class};
+  
+  //记录了用户自定义的VFS实现类
+  public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList();
+  
+ //单例模式，记录了全局唯一的VFS对象
+ private static VFS instance;
+ 
+ // VFS.getInstacne()方法会创建VFS对象，并初始化instance字段。
+ public static VFS getInstance() {
+ 		if(instance != null)
+			return instance;
+ }
+ // 优先使用用户自定义的VFS实现，如果没有自定义VFS实现，则使用Mybatis提供的VFS实现
+  ```
+   ###### DataSource与抽象工厂模式
+   在工厂方法模式中，定义了一个用于创建对象的工厂接口，并根据工厂接口的具体实现类决定具体实例化哪一个具体产品类。工厂方法模式有四个角色构成。工厂接口（Factory）、具体工厂类(ConcreteFactory)、产品接口(Product)、具体产品（ConcreteProduct）类。
+   在数据持久层中，数据源是一个非常重要的组件，其性能直接关系到整个数据持久层的性能。在实践中比较常见的第三方数据库组件有DBCP、C3P0等，Mybatis不仅可以集成第三方数据源组件，还提供了自己的数据源实现。
+   常见的数据源组件都实现了javax.sql.DataSource接口，Mybatis自身实现的数据源实现也不例外。Mybatis提供了两个javax.sql.DataSource接口实现，分别是PooledDataSource和UnpooledDataSource。Mybatis使用不同的DataSourceFactory接口实现创建不同类型的DataSource。当需要新的第三方数据源组件，只需要添加对应的工厂实现类，新的数据源就可以被Mybatis使用，而不必修改已有代码。
+   在数据源模块中，DataSourceFactory接口扮演工厂接口(Factory)的角色。UnpooledDataSourceFactory和PooledDataSourceFactory则扮演具体工厂类(ConcreteFactory)的角色。
+   ```java
+   public interface DataSourceFactory {
+   
+   // 设置DataSource的相关属性，一般紧跟在初始化之后。
+    void setProperties(Properties var1);
+// 获取DataSource对象
+    DataSource getDataSource();
+}
+   ```
+   以UnpooledDataSourceFactory为例，在UnpooledDataSourceFactory的构造方法中会直接创建UnpooledDataSource对象，并且初始化dataSource。通过setProperties（）方法完成对UnpooledDataSource对象的配置
+ ```java
+     public void setProperties(Properties properties) {
+        Properties driverProperties = new Properties();
+        MetaObject metaDataSource = SystemMetaObject.forObject(this.dataSource);
+        Iterator var4 = properties.keySet().iterator();
+
+// 遍历properties结合，完成相关的赋值
+        while(var4.hasNext()) {
+            Object key = var4.next();
+            String propertyName = (String)key;
+            String value;
+            if (propertyName.startsWith("driver.")) {
+                value = properties.getProperty(propertyName);
+                driverProperties.setProperty(propertyName.substring(DRIVER_PROPERTY_PREFIX_LENGTH), value);
+            } else {
+                if (!metaDataSource.hasSetter(propertyName)) {
+                    throw new DataSourceException("Unknown DataSource property: " + propertyName);
+                }
+
+                value = (String)properties.get(propertyName);
+                Object convertedValue = this.convertValue(metaDataSource, propertyName, value);
+                metaDataSource.setValue(propertyName, convertedValue);
+            }
+        }
+
+    }
+ ```
+ javax.sql.DataSource接口在数据源模块中扮演了产品接口（Product）的角色，Mybatis提供了两个DataSource接口的实现类，分别是UnpooledDataSource和PooledDataSource，他们扮演具体产品类（ConcreteProduct）的角色。
+ UnpooldedDataSource实现了javax.sql.DataSource接口中定义的getConnection()方法及其重载，用于获取连接。字段如下，每个字段都有相应的getter/setter方法。
+ ```java
+    private String driver;
+    private String url;
+    private String username;
+    private String password;
+    private Boolean autoCommit;
+    private Integer defaultTransactionIsolationLevel;
+ ```
+ ###### 缓存模块与装饰器模式
+ 装饰器模式能让我们在不修改源代码的情况下添加新的功能满足新需求。它是基于组合的方式实现该功能的。我们应该尽量使用组合的方式来实现功能扩展，而非使用继承的方式。装饰器模式包括三个角色：组件(component)、具体组件实现类(ConcreteComponent)、装饰器(Decorator)
+ Mybatis作为一个持久层框架，缓存是必不可少的功能。Mybatis中的缓存是两层结构的，分为一级缓存、二级缓存，但在本质上是相同的，它们使用的都是Cache接口的实现。
+ 在Mybatis的缓存模块中，使用了装饰器模式的变体，其中将Decorator接口和Component接口合并为一个Component接口。
+ Mybatis中缓存模块相关的代码未出cache包下其中Cache接口是缓存模块中最核心的接口，它定义了所有缓存的基本行为。
+ ```java
+ public interface Cache {
+    String getId();
+
+    void putObject(Object var1, Object var2);
+
+    Object getObject(Object var1);
+
+    Object removeObject(Object var1);
+
+    void clear();
+
+    int getSize();
+
+    default ReadWriteLock getReadWriteLock() {
+        return null;
+    }
+}
+ ```
+ Cache接口的实现类，如下图所示，但大部分都是装饰器，只有PerpetualCache提供了Cache接口的基本实现，它在缓存模块中扮演者ConcreteComponent的角色，其实现比较简单，底层使用HashMap记录缓存项，也是通过该HashMap对象的方法实现的Cache接口定义的方法
+ ![enter description here](./images/cache.png)
+  ```java
+public class PerpetualCache implements Cache {
+    //唯一标识
+    private final String id;
+	
+    private Map<Object, Object> cache = new HashMap();
+
+    public PerpetualCache(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public int getSize() {
+        return this.cache.size();
+    }
+
+    public void putObject(Object key, Object value) {
+        this.cache.put(key, value);
+    }
+
+    public Object getObject(Object key) {
+        return this.cache.get(key);
+    }
+
+    public Object removeObject(Object key) {
+        return this.cache.remove(key);
+    }
+
+    public void clear() {
+        this.cache.clear();
+    }
+}
+ ```
+ 下面来介绍cache.decorators包下提供的装饰器它们都实现了Cache接口，扮演者ConcreteDecorator的角色。这些装饰器会在PerpetualCache的基础上提供一些额外的功能，通过多个组合后满足一个特定的需求。下面介绍其中的一个ConcreteDecorator：BlockingCache
+ BlockingCache是阻塞版本的缓存装饰器，它会保证只有一个线程到缓存中查找指定key对应的数据。各字段的含义如下
+``` java
+	// 阻塞超时时长
+    private long timeout;
+	// 底层被装饰的Cache对象
+    private final Cache delegate;
+	// 每个key都有对应的ReentrantLock对象
+    private final ConcurrentHashMap<Object, ReentrantLock> locks;
+```
+假设线程A在BlockingCache中未查到keyA对应的缓存项时，线程A会获取keyA对应的锁，这样后续线程在查找keyA时会发生阻塞。
+```java
+    public Object getObject(Object key) {
+		// 获取该key对应的锁
+        this.acquireLock(key);
+		// 查询key
+        Object value = this.delegate.getObject(key);
+		// 缓存有key对应的缓存项，释放锁，否则继续持有锁
+        if (value != null) {
+            this.releaseLock(key);
+        }
+        return value;
+    }
+	
+	
+	// acquireLock()方法会尝试获取指定key对应的锁。如果该key没有对应的锁对象则为其创建显得ReentrantLock对象，再加锁；如果获取锁失败，则阻塞一段时间
+	    private void acquireLock(Object key) {
+		// 创建ReentrantLock对象
+       ReentrantLock lock = new ReentrantLock();
+	   // 尝试添加到locks集合中，如果locks集合中已经有了相应的ReentrantLock对象，则使用集合中的lock对象
+	   ReentrantLock previous = locks.putIfAbsent(key,lock);
+	   lock = previous == null ? lock : previous;
+		
+		// 最后，调用lock()方法，获取锁
+        lock.lock();
+    }
+```
+假设线程A从数据库中查找到keyA对应的结果对象后，将结果对象放入到BlockingCache中，此时线程A会释放keyA对应的锁，唤醒阻塞在该锁上的线程。其他线程即可从BlockingCache中获取keyA对应的数据，而不是在再次访问数据库。
+```java
+    public void putObject(Object key, Object value) {
+        try {
+		// 向缓存中添加缓存项
+            this.delegate.putObject(key, value);
+        } finally {
+		// 释放锁
+            this.releaseLock(key);
+        }
+    }
+	
+	    private void releaseLock(Object key) {
+        ReentrantLock lock = (ReentrantLock)this.locks.get(key);
+		// 判断锁是否被当前线程持有
+        if (lock.isHeldByCurrentThread()) {
+		// 调用unlock()方法释放锁
+            lock.unlock();
+        }
+
+    }
+```
